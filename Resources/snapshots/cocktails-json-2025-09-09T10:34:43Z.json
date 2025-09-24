@@ -1,0 +1,541 @@
+[
+  {
+    "cocktailCategory" : "Spirit-Forward",
+    "comment" : "",
+    "creator" : "anders erickson",
+    "id" : "7397CEAE-73EB-4074-8764-C7C07FA1C91E",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "7397CEAE-73EB-4074-8764-C7C07FA1C91E"
+        },
+        "id" : "5E2D2686-999B-4489-9007-02AF8D3D1526",
+        "name" : "sweet vermouth",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.75
+      },
+      {
+        "cocktail" : {
+          "id" : "7397CEAE-73EB-4074-8764-C7C07FA1C91E"
+        },
+        "id" : "07B901AE-439F-4C4C-A151-5A0DE87A0548",
+        "name" : "campari",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.75
+      },
+      {
+        "cocktail" : {
+          "id" : "7397CEAE-73EB-4074-8764-C7C07FA1C91E"
+        },
+        "id" : "93ACEC9F-30F2-4EDB-9C2A-3C28E61EF648",
+        "name" : "gin",
+        "orderIndex" : 0,
+        "tag" : "gin",
+        "unit" : "oz",
+        "volume" : 1.5
+      }
+    ],
+    "name" : "negroni",
+    "style" : "Stirred"
+  },
+  {
+    "cocktailCategory" : "Spirit-Forward",
+    "comment" : "",
+    "creator" : "steve the bartender",
+    "id" : "BE8A32F9-19BC-4B48-9B6F-29B1C11F7A39",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "BE8A32F9-19BC-4B48-9B6F-29B1C11F7A39"
+        },
+        "id" : "C2325C53-7C4A-43F5-BBEC-143653D34345",
+        "name" : "campari",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 1
+      },
+      {
+        "cocktail" : {
+          "id" : "BE8A32F9-19BC-4B48-9B6F-29B1C11F7A39"
+        },
+        "id" : "D0E0FA89-DC83-4CF6-8278-731D2D1DC204",
+        "name" : "gin",
+        "orderIndex" : 0,
+        "tag" : "gin",
+        "unit" : "oz",
+        "volume" : 1.5
+      },
+      {
+        "cocktail" : {
+          "id" : "BE8A32F9-19BC-4B48-9B6F-29B1C11F7A39"
+        },
+        "id" : "E69C4445-D9E7-4B06-B715-8FA3F887C55E",
+        "name" : "sweet vermouth",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 1
+      }
+    ],
+    "name" : "negroni",
+    "style" : "Stirred"
+  },
+  {
+    "cocktailCategory" : "Sour",
+    "comment" : "",
+    "creator" : "anders erickson",
+    "id" : "01779102-A7A8-40FD-870C-CA91EC5427DD",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "01779102-A7A8-40FD-870C-CA91EC5427DD"
+        },
+        "id" : "5E28DC4C-8A1E-4713-B3B2-8B18EBEB7D90",
+        "name" : "lemon juice",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.5
+      },
+      {
+        "cocktail" : {
+          "id" : "01779102-A7A8-40FD-870C-CA91EC5427DD"
+        },
+        "id" : "F1F38B2D-24BB-465E-AD9B-622305087292",
+        "name" : "gin",
+        "orderIndex" : 0,
+        "tag" : "gin",
+        "unit" : "oz",
+        "volume" : 1.5
+      },
+      {
+        "cocktail" : {
+          "id" : "01779102-A7A8-40FD-870C-CA91EC5427DD"
+        },
+        "id" : "882AF702-3D90-4F4B-A416-A44178E930D3",
+        "name" : "peychaud’s bitters",
+        "orderIndex" : 3,
+        "tag" : null,
+        "unit" : "dash",
+        "volume" : 2
+      },
+      {
+        "cocktail" : {
+          "id" : "01779102-A7A8-40FD-870C-CA91EC5427DD"
+        },
+        "id" : "906D83F8-C255-4A3F-8D76-908B5481ED96",
+        "name" : "apricot liqueur",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 1
+      }
+    ],
+    "name" : "pendennis club",
+    "style" : "Shaken"
+  },
+  {
+    "cocktailCategory" : "Sour",
+    "comment" : "A classic sour. Angostura bitters can be left out.",
+    "creator" : "daniel kleist",
+    "id" : "5E747BC4-563F-44DC-BFCF-53D58AB2EA79",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "5E747BC4-563F-44DC-BFCF-53D58AB2EA79"
+        },
+        "id" : "AE649309-6F3A-4565-8904-AB4D307E1633",
+        "name" : "bourbon",
+        "orderIndex" : 0,
+        "tag" : "whiskey",
+        "unit" : "mL",
+        "volume" : 60
+      },
+      {
+        "cocktail" : {
+          "id" : "5E747BC4-563F-44DC-BFCF-53D58AB2EA79"
+        },
+        "id" : "1CB8C6CD-F624-4BE2-83AF-2D9D9B30D1D9",
+        "name" : "lemon juice",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 30
+      },
+      {
+        "cocktail" : {
+          "id" : "5E747BC4-563F-44DC-BFCF-53D58AB2EA79"
+        },
+        "id" : "46851658-FC55-4545-B848-40A7B02D12B2",
+        "name" : "simple syrup",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 15
+      },
+      {
+        "cocktail" : {
+          "id" : "5E747BC4-563F-44DC-BFCF-53D58AB2EA79"
+        },
+        "id" : "B857978D-B190-45D7-97B2-CC1678DBC521",
+        "name" : "egg white",
+        "orderIndex" : 3,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 15
+      },
+      {
+        "cocktail" : {
+          "id" : "5E747BC4-563F-44DC-BFCF-53D58AB2EA79"
+        },
+        "id" : "AC9E43CB-754F-478B-823A-8DDC7ACAE053",
+        "name" : "angostura bitters",
+        "orderIndex" : 4,
+        "tag" : null,
+        "unit" : "drop",
+        "volume" : 3
+      }
+    ],
+    "name" : "whiskey sour",
+    "style" : "Shaken"
+  },
+  {
+    "cocktailCategory" : "Highballs and Fizzes",
+    "comment" : "A classic Highball.",
+    "creator" : "",
+    "id" : "A0C4E7CA-7FED-4C51-B3F4-E9AEFBB65BE5",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "A0C4E7CA-7FED-4C51-B3F4-E9AEFBB65BE5"
+        },
+        "id" : "8981FEF2-4F48-4867-86B6-2F7E5D76C5A4",
+        "name" : "rum",
+        "orderIndex" : 0,
+        "tag" : "rum",
+        "unit" : "mL",
+        "volume" : 45
+      },
+      {
+        "cocktail" : {
+          "id" : "A0C4E7CA-7FED-4C51-B3F4-E9AEFBB65BE5"
+        },
+        "id" : "FEBAD91D-ED1B-4E5E-AB3B-C530C540D5DA",
+        "name" : "coca cola",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 120
+      },
+      {
+        "cocktail" : {
+          "id" : "A0C4E7CA-7FED-4C51-B3F4-E9AEFBB65BE5"
+        },
+        "id" : "45429ACB-D13D-4317-A666-A3BCA501CC3D",
+        "name" : "lime juice",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 5
+      }
+    ],
+    "name" : "cuba libre",
+    "style" : "Mixed"
+  },
+  {
+    "cocktailCategory" : "Highballs and Fizzes",
+    "comment" : "Shake and top with sparkling water. Serve over ice.",
+    "creator" : "daniel kleist",
+    "id" : "498F4091-C556-40D3-870E-9698585FD09D",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "498F4091-C556-40D3-870E-9698585FD09D"
+        },
+        "id" : "61A26EB5-974D-42B4-8E59-07623A64BB98",
+        "name" : "grenadine",
+        "orderIndex" : 3,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 15
+      },
+      {
+        "cocktail" : {
+          "id" : "498F4091-C556-40D3-870E-9698585FD09D"
+        },
+        "id" : "32992AE4-9708-4860-BCC0-2189F5AEBCE2",
+        "name" : "lime juice",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 30
+      },
+      {
+        "cocktail" : {
+          "id" : "498F4091-C556-40D3-870E-9698585FD09D"
+        },
+        "id" : "E3855690-EF73-4E2F-9F4A-484DFA41E274",
+        "name" : "sparkling water",
+        "orderIndex" : 4,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 30
+      },
+      {
+        "cocktail" : {
+          "id" : "498F4091-C556-40D3-870E-9698585FD09D"
+        },
+        "id" : "C520FCAD-AD27-4A36-9610-C19EFD45D2B4",
+        "name" : "london dry gin",
+        "orderIndex" : 1,
+        "tag" : "gin",
+        "unit" : "mL",
+        "volume" : 20
+      },
+      {
+        "cocktail" : {
+          "id" : "498F4091-C556-40D3-870E-9698585FD09D"
+        },
+        "id" : "F51ED00E-0567-4CF6-A38B-E80E2B5F17D0",
+        "name" : "sloe gin",
+        "orderIndex" : 0,
+        "tag" : "gin",
+        "unit" : "mL",
+        "volume" : 40
+      }
+    ],
+    "name" : "crimson fizz",
+    "style" : "Shaken"
+  },
+  {
+    "cocktailCategory" : "Dessert Cocktails",
+    "comment" : "",
+    "creator" : "mikkel juul pedersen",
+    "id" : "484E7FFE-547D-4E3E-935D-59AC00186D22",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "484E7FFE-547D-4E3E-935D-59AC00186D22"
+        },
+        "id" : "4079F2C2-6393-462A-895C-CCA51C840A12",
+        "name" : "cognac",
+        "orderIndex" : 0,
+        "tag" : "brandy",
+        "unit" : "mL",
+        "volume" : 50
+      },
+      {
+        "cocktail" : {
+          "id" : "484E7FFE-547D-4E3E-935D-59AC00186D22"
+        },
+        "id" : "A78D01F0-7663-43F2-AF66-29A9DC01A0AD",
+        "name" : "white creme de cacao",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 30
+      },
+      {
+        "cocktail" : {
+          "id" : "484E7FFE-547D-4E3E-935D-59AC00186D22"
+        },
+        "id" : "9EB50EF9-4525-4F87-84E2-993619A6F367",
+        "name" : "cream",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 30
+      }
+    ],
+    "name" : "brandy alexander",
+    "style" : "Shaken"
+  },
+  {
+    "cocktailCategory" : "Duos",
+    "comment" : "",
+    "creator" : "",
+    "id" : "E94F6A9B-4569-4692-8BDC-184A5C295A26",
+    "imageURL" : "\/Images\/FFB8A402-3F6A-4CB5-852D-0CAA53712D0F.jpg",
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "E94F6A9B-4569-4692-8BDC-184A5C295A26"
+        },
+        "id" : "3E250B2A-DF09-46C9-A3F8-3F5CFB693135",
+        "name" : "bourbon",
+        "orderIndex" : 0,
+        "tag" : "whiskey",
+        "unit" : "mL",
+        "volume" : 60
+      },
+      {
+        "cocktail" : {
+          "id" : "E94F6A9B-4569-4692-8BDC-184A5C295A26"
+        },
+        "id" : "7361E9FD-01F5-4C97-AE7C-E0B7AC25A96F",
+        "name" : "coffee liqueur",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "mL",
+        "volume" : 15
+      },
+      {
+        "cocktail" : {
+          "id" : "E94F6A9B-4569-4692-8BDC-184A5C295A26"
+        },
+        "id" : "E0F49533-559E-4F6C-9E56-C45B551337EE",
+        "name" : "orange bitters",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "dash",
+        "volume" : 2
+      }
+    ],
+    "name" : "revolver",
+    "style" : "Stirred"
+  },
+  {
+    "cocktailCategory" : "Sour",
+    "comment" : "",
+    "creator" : "anders erickson",
+    "id" : "9E0D7056-C319-4A03-9E27-C56261FA3ADD",
+    "imageURL" : "\/Images\/D0356C49-F99E-47DD-A9F4-A57C76EE2A15.jpg",
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "9E0D7056-C319-4A03-9E27-C56261FA3ADD"
+        },
+        "id" : "1B55FE00-5AC6-4940-91A4-934B062C4365",
+        "name" : "pisco",
+        "orderIndex" : 0,
+        "tag" : "brandy",
+        "unit" : "oz",
+        "volume" : 2
+      },
+      {
+        "cocktail" : {
+          "id" : "9E0D7056-C319-4A03-9E27-C56261FA3ADD"
+        },
+        "id" : "1C4214D9-FFB3-4425-ACED-F64234864883",
+        "name" : "lemon juice",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.5
+      },
+      {
+        "cocktail" : {
+          "id" : "9E0D7056-C319-4A03-9E27-C56261FA3ADD"
+        },
+        "id" : "CD695E1B-B9C4-4389-8D84-C5BFC9EC1187",
+        "name" : "lime juice",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.5
+      },
+      {
+        "cocktail" : {
+          "id" : "9E0D7056-C319-4A03-9E27-C56261FA3ADD"
+        },
+        "id" : "B53280B3-E109-400E-8C18-9F5862F9D97C",
+        "name" : "simple syrup",
+        "orderIndex" : 3,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.75
+      },
+      {
+        "cocktail" : {
+          "id" : "9E0D7056-C319-4A03-9E27-C56261FA3ADD"
+        },
+        "id" : "B9484CE6-ED86-44A1-B593-B79C7BE6726B",
+        "name" : "egg white",
+        "orderIndex" : 4,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.5
+      },
+      {
+        "cocktail" : {
+          "id" : "9E0D7056-C319-4A03-9E27-C56261FA3ADD"
+        },
+        "id" : "4CEA6CAC-15E6-4885-84E0-7A4B8370A924",
+        "name" : "angostura bitters",
+        "orderIndex" : 5,
+        "tag" : null,
+        "unit" : "drop",
+        "volume" : 1
+      }
+    ],
+    "name" : "pisco sour",
+    "style" : "Shaken"
+  },
+  {
+    "cocktailCategory" : "Duos",
+    "comment" : "",
+    "creator" : "truffles on the rocks",
+    "id" : "90251584-FDD1-485D-AC8A-346E606D3E45",
+    "imageURL" : null,
+    "ingredients" : [
+      {
+        "cocktail" : {
+          "id" : "90251584-FDD1-485D-AC8A-346E606D3E45"
+        },
+        "id" : "5E3564ED-0193-43C1-870F-263FD72AF975",
+        "name" : "bourbon",
+        "orderIndex" : 0,
+        "tag" : "whiskey",
+        "unit" : "oz",
+        "volume" : 2.25
+      },
+      {
+        "cocktail" : {
+          "id" : "90251584-FDD1-485D-AC8A-346E606D3E45"
+        },
+        "id" : "A9A2C07D-CAA0-43FA-A225-A2620ECFFB04",
+        "name" : "maraschino liqueur",
+        "orderIndex" : 1,
+        "tag" : null,
+        "unit" : "oz",
+        "volume" : 0.5
+      },
+      {
+        "cocktail" : {
+          "id" : "90251584-FDD1-485D-AC8A-346E606D3E45"
+        },
+        "id" : "B06FAFAB-CDBB-4406-A2F6-BDBBB86EBBD4",
+        "name" : "angostura bitters",
+        "orderIndex" : 2,
+        "tag" : null,
+        "unit" : "dash",
+        "volume" : 2
+      },
+      {
+        "cocktail" : {
+          "id" : "90251584-FDD1-485D-AC8A-346E606D3E45"
+        },
+        "id" : "56D6F00A-A631-4F66-91F4-C9658C759AAF",
+        "name" : "orange bitters",
+        "orderIndex" : 3,
+        "tag" : null,
+        "unit" : "dash",
+        "volume" : 2
+      }
+    ],
+    "name" : "fancy free",
+    "style" : "Stirred"
+  }
+]
