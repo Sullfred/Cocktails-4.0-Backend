@@ -20,6 +20,7 @@ struct UserController: RouteCollection {
         // tokenProtected
         let tokenProtected = users.grouped(UserToken.authenticator(), User.guardMiddleware())
         tokenProtected.delete("me", use: deleteUser)
+        tokenProtected.post("logout", use: logout)
     }
     
     func register(req: Request) async throws -> HTTPStatus {
@@ -58,8 +59,6 @@ struct UserController: RouteCollection {
     }
 
     func login(req: Request) async throws -> LoginResponse {
-        print("The request received")
-        print(req)
         // Get user from authentication middleware
         let user = try req.auth.require(User.self)
 
@@ -71,6 +70,17 @@ struct UserController: RouteCollection {
         let publicUser = user.convertToPublic()
 
         return LoginResponse(token: token.value, user: publicUser)
+    }
+    
+    func logout(req: Request) async throws -> HTTPStatus {
+        let token = try req.auth.require(UserToken.self)
+        do {
+            try await token.delete(on: req.db)
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to delete token")
+        }
+        
+        return .ok
     }
 
     func deleteUser(req: Request) async throws -> HTTPStatus {
