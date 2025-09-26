@@ -2,3 +2,4 @@
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .swiftpm/xcode/package.xcworkspace/xcuserdata/daniel.xcuserdatad/UserInterfaceState.xcuserstate
 .swiftpm/xcode/xcuserdata/daniel.xcuserdatad/xcschemes/xcschememanagement.plist
+.env
