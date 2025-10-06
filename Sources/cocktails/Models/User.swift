@@ -49,15 +49,18 @@ final class User: Model, @unchecked Sendable, Content {
     }
     
     final class Public: @unchecked Sendable, Content {
+        var id: UUID?
         var username: String
         var addPermission: Bool
         var editPermissions: Bool
         var adminRights: Bool
 
-        init(username: String,
+        init(id: UUID?,
+             username: String,
              addPermission: Bool,
              editPermissions: Bool,
              adminRights: Bool) {
+            self.id = id
             self.username = username
             self.addPermission = addPermission
             self.editPermissions = editPermissions
@@ -75,7 +78,7 @@ extension User {
             )
         }
     func convertToPublic() -> User.Public {
-        return User.Public(username: username, addPermission: addPermission, editPermissions: editPermissions, adminRights: adminRights)
+        return User.Public(id: id, username: username, addPermission: addPermission, editPermissions: editPermissions, adminRights: adminRights)
         }
 }
 

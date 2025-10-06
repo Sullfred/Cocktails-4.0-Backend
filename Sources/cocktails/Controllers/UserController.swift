@@ -19,8 +19,11 @@ struct UserController: RouteCollection {
         
         // tokenProtected
         let tokenProtected = users.grouped(UserToken.authenticator(), User.guardMiddleware())
-        tokenProtected.delete("me", use: deleteUser)
         tokenProtected.post("logout", use: logout)
+        tokenProtected.delete("me", use: deleteUser)
+        tokenProtected.patch("updateUsername", use: updateUsername)
+        tokenProtected.patch("updatePassword", use: updatePassword)
+    
     }
     
     func register(req: Request) async throws -> HTTPStatus {
@@ -33,7 +36,7 @@ struct UserController: RouteCollection {
         
         // Pre-check: Ensure username does not already exist
         if let _ = try await User.query(on: req.db).filter(\.$username == dto.username).first() {
-            throw Abort(.badRequest, reason: "Username unavailable")
+            throw Abort(.conflict, reason: "Username unavailable")
         }
 
         let user = try User(
@@ -84,6 +87,7 @@ struct UserController: RouteCollection {
     }
 
     func deleteUser(req: Request) async throws -> HTTPStatus {
+        let token = try req.auth.require(UserToken.self)
         // Get user
         let user = try req.auth.require(User.self)
         let userId = try user.requireID()
@@ -93,9 +97,56 @@ struct UserController: RouteCollection {
             try await bar.delete(on: req.db)
         }
         
+        do {
+            try await token.delete(on: req.db)
+        } catch {
+            throw Abort(.internalServerError, reason: "Failed to delete token")
+        }
+        
         // Delete user
         try await user.delete(on: req.db)
         
         return .noContent
+    }
+    
+    func updateUsername(req: Request) async throws -> HTTPStatus {
+        let _ = try req.auth.require(UserToken.self)
+        let user = try req.auth.require(User.self)
+        let dto = try req.content.decode(UpdateUsernameDTO.self)
+        
+        // Check if username is already taken
+        if let _ = try await User.query(on: req.db).filter(\.$username == dto.newUsername).first() {
+            throw Abort(.conflict, reason: "Username unavailable")
+        }
+        
+        // Update and save
+        user.username = dto.newUsername
+        try await user.save(on: req.db)
+        
+        return .ok
+    }
+    
+    func updatePassword(req: Request) async throws -> HTTPStatus {
+        let _ = try req.auth.require(UserToken.self)
+        let user = try req.auth.require(User.self)
+        
+        // Decode DTO
+        let dto = try req.content.decode(UpdatePasswordDTO.self)
+        
+        // Verify current password
+        guard try Bcrypt.verify(dto.currentPassword, created: user.passwordHash) else {
+            throw Abort(.unauthorized, reason: "Current password is incorrect")
+        }
+        
+        // Check new password matches confirmation
+        guard dto.newPassword == dto.confirmPassword else {
+            throw Abort(.badRequest, reason: "New passwords did not match")
+        }
+        
+        // Hash and save new password
+        user.passwordHash = try Bcrypt.hash(dto.newPassword)
+        try await user.save(on: req.db)
+        
+        return .ok
     }
 }
