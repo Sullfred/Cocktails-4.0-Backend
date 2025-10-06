@@ -17,10 +17,10 @@ struct MyBarController: RouteCollection {
         mybar.get(use: getMyBar)
         mybar.post("items", use: addItem)
         mybar.delete("items", ":name", use: removeItem)
-        mybar.post("favorites", use: addFavorite)
+        mybar.post("favorites", ":cocktailID", use: addFavorite)
         mybar.delete("favorites", ":cocktailID", use: removeFavorite)
-        mybar.post("deleted", use: addDeleted)
-        mybar.delete("deleted", ":cocktailID", use: removeDeleted)
+        mybar.post("removed", use: addRemoved)
+        mybar.delete("removed", ":cocktailID", use: deleteRemoved)
     }
 
     // Fetch the authenticated user's MyBar
@@ -28,6 +28,7 @@ struct MyBarController: RouteCollection {
         let user = try req.auth.require(User.self)
         let userId = try user.requireID()
         
+        // Find users bar
         guard let bar = try await MyBar.query(on: req.db)
             .filter(\.$user.$id == userId)
             .first()
@@ -35,11 +36,14 @@ struct MyBarController: RouteCollection {
             throw Abort(.notFound, reason: "MyBar not found for user")
         }
 
-        let dto = MyBarDTO(id: try bar.requireID(),
-                           barItems: bar.barItems.map{MyBarItemDTO(name: $0.name, category: $0.category)},
-                           favoriteCocktails: bar.favorites,
-                           deletedCocktails: bar.deleted.map{DeletedCocktailDTO(id: $0.id, name: $0.name, creator: $0.creator, date: $0.date)})
-        
+        let dto = MyBarDTO(
+            id: try bar.requireID(),
+            userId: userId,
+            barItems: bar.barItems.map{ MyBarItemDTO(name: $0.name, category: $0.category) },
+            favoriteCocktails: bar.favorites,
+            deletedCocktails: bar.deleted.map{ RemovedCocktailDTO(id: $0.id, name: $0.name, creator: $0.creator, date: $0.date) }
+        )
+
         return dto
     }
 
@@ -47,15 +51,21 @@ struct MyBarController: RouteCollection {
     func addItem(req: Request) async throws -> HTTPStatus {
         let user = try req.auth.require(User.self)
         let userId = try user.requireID()
-        let newItem = try req.content.decode(MyBarItem.self)
+        let dto = try req.content.decode(MyBarItemDTO.self)
+        
+        
+        let newItem = MyBarItem(name: dto.name, category: dto.category)
 
-        guard let bar = try await MyBar.query(on: req.db).filter(\.$user.$id == userId).first()
+        guard let bar = try await MyBar.query(on: req.db)
+            .filter(\.$user.$id == userId)
+            .first()
         else {
-            throw Abort(.notFound, reason: "MyBar not found for user")
+            throw Abort(.notFound, reason: "MyBar not found")
         }
 
         bar.barItems.append(newItem)
         try await bar.save(on: req.db)
+        
         return .ok
     }
 
@@ -67,6 +77,7 @@ struct MyBarController: RouteCollection {
             throw Abort(.badRequest, reason: "Missing item name")
         }
 
+        // Find users bar
         guard let bar = try await MyBar.query(on: req.db)
             .filter(\.$user.$id == userId)
             .first()
@@ -83,61 +94,102 @@ struct MyBarController: RouteCollection {
     func addFavorite(req: Request) async throws -> HTTPStatus {
         let user = try req.auth.require(User.self)
         let userId = try user.requireID()
-        struct FavoriteRequest: Content { let cocktailID: String }
 
-        let favorite = try req.content.decode(FavoriteRequest.self)
+        guard let cocktailID = req.parameters.get("cocktailID")
+        else {
+            throw Abort(.badRequest)
+        }
 
-        guard let bar = try await MyBar.query(on: req.db).filter(\.$user.$id == userId).first()
-        else { throw Abort(.notFound) }
+        // Find users bar
+        guard let bar = try await MyBar.query(on: req.db)
+            .filter(\.$user.$id == userId)
+            .first()
+        else {
+            throw Abort(.notFound)
+        }
 
-        if !bar.favorites.contains(favorite.cocktailID) {
-            bar.favorites.append(favorite.cocktailID)
+        // Add cocktailID to favorites
+        if !bar.favorites.contains(cocktailID) {
+            bar.favorites.append(cocktailID)
             try await bar.save(on: req.db)
         }
         return .ok
     }
 
+    // Remove a cocktail from favorites
     func removeFavorite(req: Request) async throws -> HTTPStatus {
         let user = try req.auth.require(User.self)
         let userId = try user.requireID()
-        guard let cocktailID = req.parameters.get("cocktailID") else {
+        
+        guard let cocktailID = req.parameters.get("cocktailID")
+        else {
             throw Abort(.badRequest)
         }
-        guard let bar = try await MyBar.query(on: req.db).filter(\.$user.$id == userId).first()
-        else { throw Abort(.notFound) }
+        
+        // Find users bar
+        guard let bar = try await MyBar.query(on: req.db)
+            .filter(\.$user.$id == userId)
+            .first()
+        else {
+            throw Abort(.notFound) }
 
+        // Removed cocktailID from favorites
         bar.favorites.removeAll { $0 == cocktailID }
         try await bar.save(on: req.db)
         return .ok
     }
 
-    // Add a cocktail to deleted list
-    func addDeleted(req: Request) async throws -> HTTPStatus {
+    // Add a cocktail to removed list
+    func addRemoved(req: Request) async throws -> HTTPStatus {
         let user = try req.auth.require(User.self)
         let userId = try user.requireID()
-        struct DeletedRequest: Content { let cocktailID: String; let name: String; let creator: String?; let date: Date? }
 
-        let deleted = try req.content.decode(DeletedRequest.self)
+        // problem with decoding - find out why
+        let dto = try req.content.decode(RemovedCocktailDTO.self)
 
-        guard let bar = try await MyBar.query(on: req.db).filter(\.$user.$id == userId).first()
-        else { throw Abort(.notFound) }
+        // Find users bar
+        guard let bar = try await MyBar.query(on: req.db)
+            .filter(\.$user.$id == userId)
+            .first()
+        else {
+            throw Abort(.notFound)
+        }
 
-        bar.deleted.append(DeletedCocktail(id: deleted.cocktailID, name: deleted.name, creator: deleted.creator ?? "", date: deleted.date ?? Date()))
+        let deleted = DeletedCocktail(
+            id: dto.id,
+            name: dto.name,
+            creator: dto.creator,
+            date: dto.date
+        )
+        
+        bar.deleted.append(deleted)
         try await bar.save(on: req.db)
         return .ok
     }
 
-    func removeDeleted(req: Request) async throws -> HTTPStatus {
+    func deleteRemoved(req: Request) async throws -> HTTPStatus {
         let user = try req.auth.require(User.self)
         let userId = try user.requireID()
-        guard let cocktailID = req.parameters.get("cocktailID") else {
+        
+        guard let cocktailID = req.parameters.get("cocktailID")
+        else {
             throw Abort(.badRequest)
         }
-        guard let bar = try await MyBar.query(on: req.db).filter(\.$user.$id == userId).first()
-        else { throw Abort(.notFound) }
+        print(cocktailID)
+        
+        // Find users bar
+        guard let bar = try await MyBar.query(on: req.db)
+            .filter(\.$user.$id == userId)
+            .first()
+        else {
+            throw Abort(.notFound)
+        }
+        print("bar found")
 
         bar.deleted.removeAll { $0.id == cocktailID }
         try await bar.save(on: req.db)
+        print("success")
+        
         return .ok
     }
 }

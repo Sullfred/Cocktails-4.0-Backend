@@ -10,9 +10,10 @@ import Vapor
 
 struct MyBarDTO: Content {
     var id: UUID
+    var userId: UUID
     var barItems: [MyBarItemDTO]
     var favoriteCocktails: [String]
-    var deletedCocktails: [DeletedCocktailDTO]
+    var deletedCocktails: [RemovedCocktailDTO]
 }
 
 struct MyBarItemDTO: Content {
@@ -20,9 +21,13 @@ struct MyBarItemDTO: Content {
     var category: String
 }
 
-struct DeletedCocktailDTO: Content {
+struct RemovedCocktailDTO: Content {
     var id: String
     var name: String
     var creator: String
     var date: Date
+}
+
+struct FavoriteDTO: Content {
+    var cocktailID: String
 }
