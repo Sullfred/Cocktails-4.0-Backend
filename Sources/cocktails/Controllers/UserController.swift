@@ -132,14 +132,14 @@ struct UserController: RouteCollection {
         
         // Decode DTO
         let dto = try req.content.decode(UpdatePasswordDTO.self)
-        
+
         // Verify current password
         guard try Bcrypt.verify(dto.currentPassword, created: user.passwordHash) else {
             throw Abort(.unauthorized, reason: "Current password is incorrect")
         }
         
         // Check new password matches confirmation
-        guard dto.newPassword == dto.confirmPassword else {
+        guard dto.newPassword == dto.confirmNewPassword else {
             throw Abort(.badRequest, reason: "New passwords did not match")
         }
         

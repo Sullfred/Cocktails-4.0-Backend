@@ -16,5 +16,5 @@ struct UpdateUsernameDTO: Content {
 struct UpdatePasswordDTO: Content {
     let currentPassword: String
     let newPassword: String
-    let confirmPassword: String
+    let confirmNewPassword: String
 }
