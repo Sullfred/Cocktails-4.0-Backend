@@ -17,9 +17,7 @@ extension User {
                 .id()
                 .field("username", .string, .required)
                 .field("password_hash", .string, .required)
-                .field("add_permission", .bool, .required)
-                .field("edit_permission", .bool, .required)
-                .field("admin_rights", .bool, .required)
+                .field("role", .string, .required)
                 .unique(on: "username")
                 .create()
         }

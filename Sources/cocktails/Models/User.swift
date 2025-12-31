@@ -20,14 +20,8 @@ final class User: Model, @unchecked Sendable, Content {
     @Field(key: "password_hash")
     var passwordHash: String
     
-    @Field(key: "add_permission")
-    var addPermission: Bool
-    
-    @Field(key: "edit_permission")
-    var editPermissions: Bool
-    
-    @Field(key: "admin_rights")
-    var adminRights: Bool
+    @Field(key: "role")
+    var role: UserRole
     
     @OptionalChild(for: \.$user)
     var bar: MyBar?
@@ -37,36 +31,39 @@ final class User: Model, @unchecked Sendable, Content {
     init(id: UUID? = nil,
          username: String,
          passwordHash: String,
-         addPermission: Bool,
-         editPermissions: Bool,
-         adminRights: Bool) {
+         role: UserRole) {
         self.id = id
         self.username = username
         self.passwordHash = passwordHash
-        self.addPermission = addPermission
-        self.editPermissions = editPermissions
-        self.adminRights = adminRights
+        self.role = role
     }
     
     final class Public: @unchecked Sendable, Content {
         var id: UUID?
         var username: String
-        var addPermission: Bool
-        var editPermissions: Bool
-        var adminRights: Bool
+        var role: UserRole
 
         init(id: UUID?,
              username: String,
-             addPermission: Bool,
-             editPermissions: Bool,
-             adminRights: Bool) {
+             role: UserRole) {
             self.id = id
             self.username = username
-            self.addPermission = addPermission
-            self.editPermissions = editPermissions
-            self.adminRights = adminRights
+            self.role = role
         }
     }
+}
+
+enum UserRole: String, Codable, Content {
+    case guest
+    case creator
+    case admin
+    
+    // if unrecognised role we default to guest
+    init(from decoder: any Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let value = try? container.decode(String.self)
+            self = UserRole(rawValue: value ?? "") ?? .guest
+        }
 }
 
 
@@ -78,7 +75,7 @@ extension User {
             )
         }
     func convertToPublic() -> User.Public {
-        return User.Public(id: id, username: username, addPermission: addPermission, editPermissions: editPermissions, adminRights: adminRights)
+        return User.Public(id: id, username: username, role: role)
         }
 }
 

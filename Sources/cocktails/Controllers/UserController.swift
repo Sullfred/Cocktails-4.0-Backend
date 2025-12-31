@@ -16,13 +16,18 @@ struct UserController: RouteCollection {
         // protected
         let protected = users.grouped(User.authenticator())
         protected.post("login", use: login)
+        protected.post("logout", use: logout)
         
         // tokenProtected
-        let tokenProtected = users.grouped(UserToken.authenticator(), User.guardMiddleware())
-        tokenProtected.post("logout", use: logout)
+        let tokenProtected = users.grouped(UserToken.authenticator())
         tokenProtected.delete("me", use: deleteUser)
         tokenProtected.patch("updateUsername", use: updateUsername)
         tokenProtected.patch("updatePassword", use: updatePassword)
+        tokenProtected.get("verifyToken", use: verifyUserToken)
+        
+        let adminProtected = tokenProtected.grouped(RequireAdminRoleMiddleware())
+        adminProtected.get("fetchUsers", use: fetchUsers)
+        adminProtected.patch("updateUserRole", use: updateUserRole)
     
     }
     
@@ -42,9 +47,7 @@ struct UserController: RouteCollection {
         let user = try User(
             username: dto.username,
             passwordHash: Bcrypt.hash(dto.password),
-            addPermission: false,
-            editPermissions: false,
-            adminRights: false
+            role: .guest
         )
 
         do {
@@ -76,13 +79,17 @@ struct UserController: RouteCollection {
     }
     
     func logout(req: Request) async throws -> HTTPStatus {
-        let token = try req.auth.require(UserToken.self)
-        do {
-            try await token.delete(on: req.db)
-        } catch {
-            throw Abort(.internalServerError, reason: "Failed to delete token")
+        // Attempt to get token if it exists
+        if let token = req.auth.get(UserToken.self) {
+            do {
+                try await token.delete(on: req.db)
+            } catch {
+                req.logger.warning("Failed to delete user token during logout", metadata: [
+                    "error": "\(error)"
+                ])
+            }
         }
-        
+
         return .ok
     }
 
@@ -149,4 +156,38 @@ struct UserController: RouteCollection {
         
         return .ok
     }
+    
+    // Get all users who are not admin
+    func fetchUsers(req: Request) async throws -> [User.Public] {
+        let _ = try req.auth.require(UserToken.self)
+        
+        let users = try await User.query(on: req.db)
+            .filter(\.$role != .admin)
+            .all()
+        
+        return users.map { $0.convertToPublic() }
+    }
+    
+    func updateUserRole(req: Request) async throws -> HTTPStatus {
+        let _ = try req.auth.require(UserToken.self)
+        
+        let dto = try req.content.decode(UpdateUserRoleDTO.self)
+        
+        guard let user = try await User.find(dto.id, on: req.db)
+        else {
+            throw Abort(.notFound, reason: "User not found")
+        }
+        
+        user.role = dto.role
+        try await user.save(on: req.db)
+        
+        return .ok
+    }
+    
+    func verifyUserToken(req: Request) async throws -> HTTPStatus {
+        let _ = try req.auth.require(User.self)
+
+        return .ok
+    }
+
 }

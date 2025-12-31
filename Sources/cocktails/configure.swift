@@ -8,6 +8,8 @@ public func configure(_ app: Application) async throws {
     // uncomment to serve files from /Public folder
     app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     
+    app.middleware.use(APIKeyMiddleware())
+    
     // Allow for sending data of more than 1mb to be able to send images
     app.routes.defaultMaxBodySize = "4mb"
 
@@ -20,8 +22,8 @@ public func configure(_ app: Application) async throws {
         tls: .prefer(try .init(configuration: .clientDefault)))
     ), as: .psql)
 
-    //app.migrations.add(Cocktail.CocktailMigration())
-    //app.migrations.add(Ingredient.IngredientMigration())
+    app.migrations.add(Cocktail.CocktailMigration())
+    app.migrations.add(Ingredient.IngredientMigration())
     app.migrations.add(User.UserMigration())
     app.migrations.add(UserToken.TokenMigration())
     app.migrations.add(MyBar.MyBarMigration())
@@ -30,10 +32,11 @@ public func configure(_ app: Application) async throws {
     
     app.asyncCommands.use(JsonSnapshotCommand(), as: "jsonsnapshot")
     app.asyncCommands.use(ImportCocktailsCommand(), as: "importcocktails")
+    app.asyncCommands.use(AssignAdminCommand(), as: "assignAdmin")
     
 
-    // Restore from snapshot if database is empty on startup
-    app.lifecycle.use(ImportOnStartupLifecycle(app: app))
+    // Restore from snapshot if database is empty on startup and takes a snapshot on shutdown
+    app.lifecycle.use(lifeCycleHandler(app: app))
     
     // register routes
     try routes(app)

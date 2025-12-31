@@ -4,3 +4,7 @@
 .swiftpm/xcode/xcuserdata/daniel.xcuserdatad/xcschemes/xcschememanagement.plist
 .env
 /.build
+.env.development
+.swiftpm/xcode/xcshareddata/xcschemes/cocktails.xcscheme
+/Resources/snapshots/Users
+/Resources/snapshots/Bars

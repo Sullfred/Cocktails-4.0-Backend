@@ -18,3 +18,8 @@ struct UpdatePasswordDTO: Content {
     let newPassword: String
     let confirmNewPassword: String
 }
+
+struct UpdateUserRoleDTO: Content {
+    let id: UUID
+    let role: UserRole
+}

@@ -1,11 +1,44 @@
 //
-//  dbController.swift
+//  CocktailCommands.swift
 //  cocktails
 //
-//  Created by Daniel Vang Kleist on 08/09/2025.
+//  Created by Daniel Vang Kleist on 16/11/2025.
 //
 
 import Vapor
+import Fluent
+
+struct JsonSnapshotCommand: AsyncCommand {
+    struct Signature: CommandSignature {}
+    var help: String = "Takes a JSON snapshot of all cocktails and ingredients"
+
+    func run(using context: CommandContext, signature: Signature) async throws {
+        let app = context.application
+        let db = app.db
+        let timestamp = ISO8601DateFormatter().string(from: Date())
+        let snapshotFile = "Resources/snapshots/Cocktails/cocktails-json-\(timestamp).json"
+
+        // Query all cocktails with ingredients
+        let cocktails = try await Cocktail.query(on: db)
+            .with(\.$ingredients)
+            .all()
+
+        // Prepare encoder
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+        let data = try encoder.encode(cocktails)
+
+        // Ensure the directory exists
+        let url = URL(fileURLWithPath: snapshotFile)
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+
+        // Write the file
+        try data.write(to: url)
+
+        context.console.info("JSON snapshot saved to \(snapshotFile)")
+    }
+}
 
 struct SnapshotCommand: AsyncCommand {
     struct Signature: CommandSignature {}
@@ -42,38 +75,6 @@ struct SnapshotCommand: AsyncCommand {
 }
 
 
-struct JsonSnapshotCommand: AsyncCommand {
-    struct Signature: CommandSignature {}
-    var help: String = "Takes a JSON snapshot of all cocktails and ingredients"
-
-    func run(using context: CommandContext, signature: Signature) async throws {
-        let app = context.application
-        let db = app.db
-        let timestamp = ISO8601DateFormatter().string(from: Date())
-        let snapshotFile = "Resources/snapshots/cocktails-json-\(timestamp).json"
-
-        // Query all cocktails with ingredients
-        let cocktails = try await Cocktail.query(on: db)
-            .with(\.$ingredients)
-            .all()
-
-        // Prepare encoder
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-
-        let data = try encoder.encode(cocktails)
-
-        // Ensure the directory exists
-        let url = URL(fileURLWithPath: snapshotFile)
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-
-        // Write the file
-        try data.write(to: url)
-
-        context.console.info("JSON snapshot saved to \(snapshotFile)")
-    }
-}
-
 struct ImportCocktailsCommand: AsyncCommand {
     struct Signature: CommandSignature {
         @Option(name: "file", help: "Path to cocktails JSON file")
@@ -87,7 +88,7 @@ struct ImportCocktailsCommand: AsyncCommand {
     func run(using context: CommandContext, signature: Signature) async throws {
         let app = context.application
 
-        let filePath = signature.file ?? app.directory.resourcesDirectory + "snapshots/cocktailsOutput.json"
+        let filePath = signature.file ?? app.directory.resourcesDirectory + "snapshots/Cocktails/cocktailsOutput.json"
         let url = URL(fileURLWithPath: filePath)
 
         guard let data = try? Data(contentsOf: url) else {
