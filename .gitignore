@@ -6,5 +6,5 @@
 /.build
 .env.development
 .swiftpm/xcode/xcshareddata/xcschemes/cocktails.xcscheme
-/Resources/snapshots/Users
-/Resources/snapshots/Bars
+/Resources/snapshots/Users/
+/Resources/snapshots/Bars/
