@@ -28,7 +28,7 @@ struct UserController: RouteCollection {
         let adminProtected = tokenProtected.grouped(RequireAdminRoleMiddleware())
         adminProtected.get("fetchUsers", use: fetchUsers)
         adminProtected.patch("updateUserRole", use: updateUserRole)
-    
+        
     }
     
     func register(req: Request) async throws -> HTTPStatus {
@@ -43,38 +43,39 @@ struct UserController: RouteCollection {
         if let _ = try await User.query(on: req.db).filter(\.$username == dto.username).first() {
             throw Abort(.conflict, reason: "Username unavailable")
         }
-
-        let user = try User(
-            username: dto.username,
-            passwordHash: Bcrypt.hash(dto.password),
-            role: .guest
-        )
-
+        
         do {
-            try await user.save(on: req.db)
+            try await req.db.transaction { database in
+                let user = try User(
+                    username: dto.username,
+                    passwordHash: Bcrypt.hash(dto.password),
+                    role: .guest
+                )
+                try await user.save(on: req.db)
+                
+                // Create a MyBar instance for the new user
+                let userId = try user.requireID()
+                let bar = MyBar(userID: userId, barItems: [], favorites: [], deleted: [])
+                try await bar.save(on: req.db)
+            }
         } catch {
             throw Abort(.badRequest, reason: "Failed to register user")
         }
-
-        // Create a MyBar instance for the new user
-        let userId = try user.requireID()
-        let bar = MyBar(userID: userId, barItems: [], favorites: [], deleted: [])
-        try await bar.save(on: req.db)
-
+        
         return .created
     }
-
+    
     func login(req: Request) async throws -> LoginResponse {
         // Get user from authentication middleware
         let user = try req.auth.require(User.self)
-
+        
         // Generate token
         let token = try user.generateToken()
         try await token.save(on: req.db)
-
+        
         // Map the user to the public representation
         let publicUser = user.convertToPublic()
-
+        
         return LoginResponse(token: token.value, user: publicUser)
     }
     
@@ -89,10 +90,10 @@ struct UserController: RouteCollection {
                 ])
             }
         }
-
+        
         return .ok
     }
-
+    
     func deleteUser(req: Request) async throws -> HTTPStatus {
         let token = try req.auth.require(UserToken.self)
         // Get user
@@ -139,7 +140,7 @@ struct UserController: RouteCollection {
         
         // Decode DTO
         let dto = try req.content.decode(UpdatePasswordDTO.self)
-
+        
         // Verify current password
         guard try Bcrypt.verify(dto.currentPassword, created: user.passwordHash) else {
             throw Abort(.unauthorized, reason: "Current password is incorrect")
@@ -186,8 +187,7 @@ struct UserController: RouteCollection {
     
     func verifyUserToken(req: Request) async throws -> HTTPStatus {
         let _ = try req.auth.require(User.self)
-
+        
         return .ok
     }
-
 }

@@ -75,6 +75,9 @@ struct CocktailController: RouteCollection {
         else {
             throw Abort(.internalServerError)
         }
+        
+        await req.application.messageLogs.info(req: req, message: "Created cocktail '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
+        
         return CocktailDTO(from: saved)
     }
 
@@ -163,6 +166,9 @@ struct CocktailController: RouteCollection {
         else {
             throw Abort(.internalServerError)
         }
+        
+        await req.application.messageLogs.info(req: req, message: "Updated cocktail '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
+        
         return CocktailDTO(from: saved)
     }
 
@@ -181,6 +187,9 @@ struct CocktailController: RouteCollection {
         }
         
         try await cocktail.delete(on: req.db)
+        
+        await req.application.messageLogs.warning(req: req, message: "Deleted cocktail '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
+        
         return .noContent
     }
     
@@ -211,6 +220,8 @@ struct CocktailController: RouteCollection {
 
         cocktail.imageURL = "/Images/\(filename)"
         try await cocktail.save(on: req.db)
+        
+        await req.application.messageLogs.info(req: req, message: "Uploaded cocktail Image for '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
 
         return .ok
     }
@@ -230,6 +241,8 @@ struct CocktailController: RouteCollection {
             cocktail.imageURL = nil
             try await cocktail.save(on: req.db)
         }
+        
+        await req.application.messageLogs.info(req: req, message: "Deleted cocktail Image for '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
 
         return .noContent
     }
@@ -271,6 +284,8 @@ struct CocktailController: RouteCollection {
         // Update cocktail with new image path
         cocktail.imageURL = "/Images/\(filename)"
         try await cocktail.save(on: req.db)
+        
+        await req.application.messageLogs.info(req: req, message: "Updated cocktail Image for '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
 
         return .ok
     }
