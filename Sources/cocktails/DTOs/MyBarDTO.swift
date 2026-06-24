@@ -11,23 +11,21 @@ import Vapor
 struct MyBarDTO: Content {
     var id: UUID
     var userId: UUID
-    var barItems: [MyBarItemDTO]
+    var barItems: [BarItemDTO]
     var favoriteCocktails: [String]
-    var deletedCocktails: [RemovedCocktailDTO]
+    var hiddenCocktails: [HiddenCocktailDTO]
 }
 
-struct MyBarItemDTO: Content {
-    var name: String
-    var category: String
-}
-
-struct RemovedCocktailDTO: Content {
-    var id: String
-    var name: String
-    var creator: String
-    var date: Date
-}
-
-struct FavoriteDTO: Content {
-    var cocktailID: String
+extension MyBarDTO {
+    init(from myBar: MyBar) {
+        self.id = myBar.id!
+        self.userId = myBar.user.id!
+        self.barItems = myBar.barItems.map {
+            BarItemDTO(from: $0)
+        }
+        self.favoriteCocktails = myBar.favorites
+        self.hiddenCocktails = myBar.hidden.map {
+            HiddenCocktailDTO(from: $0)
+        }
+    }
 }

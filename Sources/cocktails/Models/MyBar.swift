@@ -17,38 +17,24 @@ final class MyBar: Model, @unchecked Sendable {
     @Parent(key: "user_id")
     var user: User
     
-    @Field(key: "bar_items")
-    var barItems: [MyBarItem]
+    @Children(for: \.$bar)
+    var barItems: [BarItem]
     
     @Field(key: "favorite_cocktails")
     var favorites: [String]
     
-    @Field(key: "deleted_cocktails")
-    var deleted: [DeletedCocktail]
+    @Children(for: \.$bar)
+    var hidden: [HiddenCocktail]
     
     init() {}
     
     init(id: UUID? = nil,
          userID: UUID,
-         barItems: [MyBarItem] = [],
-         favorites: [String] = [],
-         deleted: [DeletedCocktail] = []) {
+         favorites: [String] = []) {
         self.id = id
         self.$user.id = userID
-        self.barItems = barItems
         self.favorites = favorites
-        self.deleted = deleted
     }
 }
 
-struct MyBarItem: Codable, Sendable {
-    var name: String
-    var category: String
-}
 
-struct DeletedCocktail: Codable, Sendable {
-    var id: String
-    var name: String
-    var creator: String
-    var date: Date
-}

@@ -55,7 +55,7 @@ struct UserController: RouteCollection {
                 
                 // Create a MyBar instance for the new user
                 let userId = try user.requireID()
-                let bar = MyBar(userID: userId, barItems: [], favorites: [], deleted: [])
+                let bar = MyBar(userID: userId, favorites: [])
                 try await bar.save(on: req.db)
             }
         } catch {
@@ -102,6 +102,19 @@ struct UserController: RouteCollection {
         
         // Find users bar and delete it if it exist
         if let bar = try await MyBar.query(on: req.db).filter(\.$user.$id == userId).first() {
+            
+            let BarItems = try await BarItem.query(on: req.db).filter(\.$bar.$id == bar.requireID()).all()
+            
+            for item in BarItems {
+                try await item.delete(on: req.db)
+            }
+            
+            let hidden = try await HiddenCocktail.query(on: req.db).filter(\.$bar.$id == bar.requireID()).all()
+            
+            for item in hidden {
+                try await item.delete(on: req.db)
+            }
+            
             try await bar.delete(on: req.db)
         }
         

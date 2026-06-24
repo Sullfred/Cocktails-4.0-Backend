@@ -60,10 +60,10 @@ enum UserRole: String, Codable, Content {
     
     // if unrecognised role we default to guest
     init(from decoder: any Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            let value = try? container.decode(String.self)
-            self = UserRole(rawValue: value ?? "") ?? .guest
-        }
+        let container = try decoder.singleValueContainer()
+        let value = try? container.decode(String.self)
+        self = UserRole(rawValue: value ?? "") ?? .guest
+    }
 }
 
 

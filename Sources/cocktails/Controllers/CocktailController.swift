@@ -175,7 +175,8 @@ struct CocktailController: RouteCollection {
     // Delete a cocktail
     func deleteCocktail(req: Request) async throws -> HTTPStatus {
         guard let id = req.parameters.get("id", as: UUID.self),
-              let cocktail = try await Cocktail.find(id, on: req.db) else {
+              let cocktail = try await Cocktail.find(id, on: req.db)
+        else {
             throw Abort(.notFound)
         }
         // Delete related ingredients before the cocktail to not violate foreign key constraints

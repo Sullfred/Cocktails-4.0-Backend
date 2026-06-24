@@ -16,9 +16,7 @@ extension MyBar {
             try await database.schema("bars")
                 .id()
                 .field("user_id", .uuid, .required, .references("users", "id"))
-                .field("bar_items", .array(of: .json), .required)
                 .field("favorite_cocktails", .array(of: .string), .required)
-                .field("deleted_cocktails", .array(of: .json), .required)
                 .unique(on: "user_id")
                 .create()
         }
