@@ -35,7 +35,7 @@ struct MyBarController: RouteCollection {
             .with(\.$hidden)
             .first()
         else {
-            throw Abort(.notFound, reason: "MyBar not found for user")
+            throw Abort(.notFound, reason: "MyBar not found for user: \(user.username)")
         }
 
         return MyBarDTO(from: bar)
@@ -51,7 +51,7 @@ struct MyBarController: RouteCollection {
             .filter(\.$user.$id == userId)
             .first()
         else {
-            throw Abort(.notFound, reason: "MyBar not found")
+            throw Abort(.notFound, reason: "MyBar not found for user: \(user.username)")
         }
         
         let newItem = BarItem(
@@ -68,10 +68,14 @@ struct MyBarController: RouteCollection {
 
     func removeItem(req: Request) async throws -> HTTPStatus {
         let _ = try req.auth.require(User.self)
-        guard let id = req.parameters.get("id", as: UUID.self),
-                let item = try await BarItem.find(id, on: req.db)
+        guard let id = req.parameters.get("id", as: UUID.self)
         else {
             throw Abort(.badRequest)
+        }
+                
+        guard let item = try await BarItem.find(id, on: req.db)
+        else {
+            throw Abort(.notFound, reason: "Item with ID: \(req.parameters.get("id") ?? "No ID") was not found")
         }
 
         try await item.delete(on: req.db)
@@ -93,7 +97,7 @@ struct MyBarController: RouteCollection {
             .filter(\.$user.$id == userId)
             .first()
         else {
-            throw Abort(.notFound)
+            throw Abort(.notFound, reason: "MyBar not found for user: \(user.username)")
         }
 
         // Add cocktailID to favorites
@@ -119,7 +123,8 @@ struct MyBarController: RouteCollection {
             .filter(\.$user.$id == userId)
             .first()
         else {
-            throw Abort(.notFound) }
+            throw Abort(.notFound, reason: "MyBar not found for user: \(user.username)")
+        }
 
         // Removed cocktailID from favorites
         bar.favorites.removeAll { $0 == cocktailID }
@@ -138,7 +143,7 @@ struct MyBarController: RouteCollection {
             .filter(\.$user.$id == userId)
             .first()
         else {
-            throw Abort(.notFound)
+            throw Abort(.notFound, reason: "MyBar not found for user: \(user.username)")
         }
 
         let hidden = HiddenCocktail(
@@ -157,10 +162,14 @@ struct MyBarController: RouteCollection {
     func deleteRemoved(req: Request) async throws -> HTTPStatus {
         let _ = try req.auth.require(User.self)
         
-        guard let id = req.parameters.get("id", as: UUID.self),
-                let hidden = try await HiddenCocktail.find(id, on: req.db)
+        guard let id = req.parameters.get("id", as: UUID.self)
         else {
             throw Abort(.badRequest)
+        }
+        
+        guard let hidden = try await HiddenCocktail.find(id, on: req.db)
+        else {
+            throw Abort(.notFound, reason: "cocktail with ID: \(req.parameters.get("id") ?? "No ID") was not found")
         }
 
         try await hidden.delete(on: req.db)

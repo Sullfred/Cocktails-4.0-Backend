@@ -13,19 +13,15 @@ struct CocktailController: RouteCollection {
         let cocktails = routes.grouped("cocktails")
         
         // Basic routes
-        cocktails.get(use: index)
-        cocktails.get(":id", use: get)
-        cocktails.get(":id", "image", use: getImage)
+        cocktails.get(use: getAll)
+        cocktails.get(":id", use: getCocktail)
         
         // Protected routes - ensure valid userToken and permissions
         let tokenProtected = cocktails.grouped(UserToken.authenticator())
         
         let creatorProtected = tokenProtected.grouped(RequireCreatorRoleMiddleware())
-        creatorProtected.post(use: create)
-        creatorProtected.post(":id", "image", use: uploadImage)
+        creatorProtected.post(use: createCocktail)
         creatorProtected.put(":id", use: update)
-        creatorProtected.put(":id", "image", use: updateImage)
-        creatorProtected.delete(":id", "image", use: deleteImage)
         
         let adminProtected = tokenProtected.grouped(RequireAdminRoleMiddleware())
         adminProtected.delete(":id", use: deleteCocktail)
@@ -33,7 +29,7 @@ struct CocktailController: RouteCollection {
     }
 
     // Fetch all cocktails, eager-load ingredients
-    func index(req: Request) async throws -> [CocktailDTO] {
+    func getAll(req: Request) async throws -> [CocktailDTO] {
         let cocktails = try await Cocktail.query(on: req.db)
             .with(\.$ingredients)
             .all()
@@ -41,7 +37,7 @@ struct CocktailController: RouteCollection {
     }
 
     // Create a new cocktail + its ingredients
-    func create(req: Request) async throws -> CocktailDTO {
+    func createCocktail(req: Request) async throws -> CocktailDTO {
         let dto = try req.content.decode(CocktailDTO.self)
         
         let cocktail = Cocktail(
@@ -82,7 +78,7 @@ struct CocktailController: RouteCollection {
     }
 
     // Get a cocktail by ID
-    func get(req: Request) async throws -> CocktailDTO {
+    func getCocktail(req: Request) async throws -> CocktailDTO {
         guard let id = req.parameters.get("id", as: UUID.self) else {
             throw Abort(.badRequest)
         }
@@ -91,33 +87,9 @@ struct CocktailController: RouteCollection {
             .with(\.$ingredients)
             .first()
         else {
-            throw Abort(.notFound)
+            throw Abort(.notFound, reason: "Cocktail with ID: \(req.parameters.get("id") ?? "No ID") was not found")
         }
         return CocktailDTO(from: cocktail)
-    }
-    
-    // Get the image for a cocktail
-    func getImage(req: Request) async throws -> Response {
-        guard let id = req.parameters.get("id", as: UUID.self) else {
-            throw Abort(.badRequest)
-        }
-        guard let cocktail = try await Cocktail.find(id, on: req.db) else {
-            throw Abort(.notFound)
-        }
-        guard let imageURL = cocktail.imageURL else {
-            throw Abort(.notFound)
-        }
-        
-        let trimmedPath = imageURL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        let fullPath = req.application.directory.publicDirectory + trimmedPath
-        
-        guard FileManager.default.fileExists(atPath: fullPath) else {
-            throw Abort(.notFound)
-        }
-        
-        let image = try await req.fileio.asyncStreamFile(at: fullPath)
-        
-        return image
     }
 
     // Update cocktail + ingredients
@@ -131,7 +103,7 @@ struct CocktailController: RouteCollection {
             .with(\.$ingredients)
             .first()
         else {
-            throw Abort(.notFound)
+            throw Abort(.notFound, reason: "Cocktail with ID: \(req.parameters.get("id") ?? "No ID") was not found")
         }
         
         cocktail.name = dto.name
@@ -174,10 +146,13 @@ struct CocktailController: RouteCollection {
 
     // Delete a cocktail
     func deleteCocktail(req: Request) async throws -> HTTPStatus {
-        guard let id = req.parameters.get("id", as: UUID.self),
-              let cocktail = try await Cocktail.find(id, on: req.db)
+        guard let id = req.parameters.get("id", as: UUID.self)
         else {
-            throw Abort(.notFound)
+            throw Abort(.badRequest)
+        }
+        guard let cocktail = try await Cocktail.find(id, on: req.db)
+        else {
+            throw Abort(.notFound, reason: "Cocktail with ID: \(req.parameters.get("id") ?? "No ID") was not found")
         }
         // Delete related ingredients before the cocktail to not violate foreign key constraints
         let ingredients = try await Ingredient.query(on: req.db)
@@ -192,102 +167,5 @@ struct CocktailController: RouteCollection {
         await req.application.messageLogs.warning(req: req, message: "Deleted cocktail '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
         
         return .noContent
-    }
-    
-    // Upload an image for a cocktail
-    func uploadImage(req: Request) async throws -> HTTPStatus {
-        guard let id = req.parameters.get("id", as: UUID.self),
-              let cocktail = try await Cocktail.find(id, on: req.db) else {
-            throw Abort(.notFound)
-        }
-
-        struct ImageUpload: Content {
-            var file: File
-        }
-
-        let upload = try req.content.decode(ImageUpload.self)
-        let imagesDirectory = req.application.directory.publicDirectory + "Images/"
-        let filename = "\(UUID().uuidString).jpg"
-        let fullPath = imagesDirectory + filename
-
-        // Ensure Images directory exists
-        try FileManager.default.createDirectory(
-            atPath: imagesDirectory,
-            withIntermediateDirectories: true,
-            attributes: nil
-        )
-
-        try await req.fileio.writeFile(upload.file.data, at: fullPath)
-
-        cocktail.imageURL = "/Images/\(filename)"
-        try await cocktail.save(on: req.db)
-        
-        await req.application.messageLogs.info(req: req, message: "Uploaded cocktail Image for '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
-
-        return .ok
-    }
-
-    // Delete an image for a cocktail
-    func deleteImage(req: Request) async throws -> HTTPStatus {
-        guard let id = req.parameters.get("id", as: UUID.self),
-              let cocktail = try await Cocktail.find(id, on: req.db) else {
-            throw Abort(.notFound)
-        }
-
-        if let imageURL = cocktail.imageURL {
-            let path = req.application.directory.publicDirectory + imageURL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-            if FileManager.default.fileExists(atPath: path) {
-                try FileManager.default.removeItem(atPath: path)
-            }
-            cocktail.imageURL = nil
-            try await cocktail.save(on: req.db)
-        }
-        
-        await req.application.messageLogs.info(req: req, message: "Deleted cocktail Image for '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
-
-        return .noContent
-    }
-    
-    // Update an image for a cocktail
-    func updateImage(req: Request) async throws -> HTTPStatus {
-        guard let id = req.parameters.get("id", as: UUID.self),
-              let cocktail = try await Cocktail.find(id, on: req.db) else {
-            throw Abort(.notFound)
-        }
-
-        struct ImageUpload: Content {
-            var file: File
-        }
-
-        let upload = try req.content.decode(ImageUpload.self)
-        let imagesDirectory = req.application.directory.publicDirectory + "Images/"
-        // Ensure directory exists
-        try FileManager.default.createDirectory(
-            atPath: imagesDirectory,
-            withIntermediateDirectories: true,
-            attributes: nil
-        )
-        
-        let filename: String
-            if let existingURL = cocktail.imageURL {
-                // Reuse existing filename
-                filename = URL(fileURLWithPath: existingURL).lastPathComponent
-            } else {
-                // New image
-                filename = "\(UUID().uuidString).jpg"
-            }
-
-        let fullPath = imagesDirectory + filename
-
-        // Write new image to disk
-        try await req.fileio.writeFile(upload.file.data, at: fullPath)
-
-        // Update cocktail with new image path
-        cocktail.imageURL = "/Images/\(filename)"
-        try await cocktail.save(on: req.db)
-        
-        await req.application.messageLogs.info(req: req, message: "Updated cocktail Image for '\(cocktail.name)' : \(cocktail.id?.uuidString ?? "No Id found")")
-
-        return .ok
     }
 }

@@ -89,7 +89,10 @@ private extension lifeCycleHandler {
         writeSnapshot("cocktails", folder: "Cocktails", data: cocktailsData)
 
         // Bars
-        let bars = try await MyBar.query(on: db).all()
+        let bars = try await MyBar.query(on: db)
+            .with(\.$barItems)
+            .with(\.$hidden)
+            .all()
         let barsData = try encoder.encode(bars)
         writeSnapshot("bars", folder: "Bars", data: barsData)
 
@@ -132,37 +135,37 @@ private extension lifeCycleHandler {
         let data = try Data(contentsOf: url)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        let dtos = try decoder.decode([CocktailDTO].self, from: data)
+        let cocktails = try decoder.decode([CocktailDTO].self, from: data)
 
         try await app.db.transaction { db in
-            for dto in dtos {
-                let cocktail = Cocktail(
-                    id: dto.id,
-                    name: dto.name,
-                    creator: dto.creator,
-                    style: dto.style,
-                    comment: dto.comment,
-                    cocktailCategory: dto.cocktailCategory,
-                    imageURL: dto.imageURL
+            for cocktail in cocktails {
+                let _cocktail = Cocktail(
+                    id: cocktail.id,
+                    name: cocktail.name,
+                    creator: cocktail.creator,
+                    style: cocktail.style,
+                    comment: cocktail.comment,
+                    cocktailCategory: cocktail.cocktailCategory,
+                    imageURL: cocktail.imageURL
                 )
-                try await cocktail.create(on: db)
+                try await _cocktail.create(on: db)
 
-                for ing in dto.ingredients {
-                    let ingredient = Ingredient(
-                        id: ing.id,
-                        cocktailID: dto.id,
-                        volume: ing.volume,
-                        unit: ing.unit,
-                        name: ing.name,
-                        tag: ing.tag,
-                        orderIndex: ing.orderIndex
+                for ingredient in _cocktail.ingredients {
+                    let _ingredient = Ingredient(
+                        id: ingredient.id,
+                        cocktailID: _cocktail.id!,
+                        volume: ingredient.volume,
+                        unit: ingredient.unit,
+                        name: ingredient.name,
+                        tag: ingredient.tag,
+                        orderIndex: ingredient.orderIndex
                     )
-                    try await ingredient.create(on: db)
+                    try await _ingredient.create(on: db)
                 }
             }
         }
 
-        app.logger.info("Restored \(dtos.count) cocktails from snapshot")
+        app.logger.info("Restored \(cocktails.count) cocktails from snapshot")
     }
 
     func restoreBars() async throws {
@@ -173,11 +176,38 @@ private extension lifeCycleHandler {
         let data = try Data(contentsOf: url)
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        let bars = try decoder.decode([MyBar].self, from: data)
+        let bars = try decoder.decode([MyBarDTO].self, from: data)
 
         try await app.db.transaction { db in
             for bar in bars {
-                try await bar.create(on: db)
+                let _bar = MyBar(
+                    id: bar.id,
+                    userID: bar.userId,
+                    favorites: bar.favoriteCocktails
+                )
+                try await _bar.create(on: db)
+                
+                for barItem in _bar.barItems {
+                    let _barItem = BarItem(
+                        id: barItem.id,
+                        barId: _bar.id!,
+                        name: barItem.name,
+                        category: barItem.category
+                    )
+                    try await _barItem.create(on: db)
+                }
+                
+                for hiddenCocktail in _bar.hidden {
+                    let _hiddenCocktail = HiddenCocktail(
+                        id: hiddenCocktail.id,
+                        barId: _bar.id!,
+                        cocktailId: hiddenCocktail.cocktailId,
+                        name: hiddenCocktail.name,
+                        creator: hiddenCocktail.creator,
+                        date: hiddenCocktail.date
+                    )
+                    try await _hiddenCocktail.create(on: db)
+                }
             }
         }
 

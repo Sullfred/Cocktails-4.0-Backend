@@ -19,7 +19,7 @@ struct MyBarDTO: Content {
 extension MyBarDTO {
     init(from myBar: MyBar) {
         self.id = myBar.id!
-        self.userId = myBar.user.id!
+        self.userId = myBar.$user.id
         self.barItems = myBar.barItems.map {
             BarItemDTO(from: $0)
         }
