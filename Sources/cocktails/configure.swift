@@ -36,7 +36,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(MyBar.MyBarMigration())
     app.migrations.add(BarItem.BarItemMigration())
     app.migrations.add(HiddenCocktail.HiddenCocktailMigration())
-    //app.migrations.add(MessageLog.MessageLogMigration())
+    app.migrations.add(MessageLog.MessageLogMigration())
     
     app.logger.logLevel = .debug
     

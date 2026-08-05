@@ -17,7 +17,7 @@ struct APIKeyMiddleware: AsyncMiddleware {
         guard let providedKey = req.headers.first(name: "x-api-key"),
               providedKey == expectedKey
         else {
-            throw Abort(.unauthorized, reason: "Invalid API key")
+            throw Abort(.unauthorized, reason: "Invalid API key: \(req.headers.first(name: "x-api-key") ?? "No KEY in header")")
         }
 
         return try await next.respond(to: req)

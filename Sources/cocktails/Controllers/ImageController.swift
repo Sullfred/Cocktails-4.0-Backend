@@ -89,13 +89,6 @@ struct ImageController: RouteCollection {
         let filename = "\(UUID().uuidString).\(ext)"
         let fullPath = imagesDirectory + filename
 
-        // Ensure Images directory exists
-        try FileManager.default.createDirectory(
-            atPath: imagesDirectory,
-            withIntermediateDirectories: true,
-            attributes: nil
-        )
-
         try await req.fileio.writeFile(upload.file.data, at: fullPath)
 
         cocktail.imageURL = "/Images/\(filename)"
@@ -124,12 +117,6 @@ struct ImageController: RouteCollection {
 
         let upload = try req.content.decode(ImageUpload.self)
         let imagesDirectory = req.application.directory.publicDirectory + "Images/"
-        // Ensure directory exists
-        try FileManager.default.createDirectory(
-            atPath: imagesDirectory,
-            withIntermediateDirectories: true,
-            attributes: nil
-        )
         
         let filename: String
         if let existingURL = cocktail.imageURL,

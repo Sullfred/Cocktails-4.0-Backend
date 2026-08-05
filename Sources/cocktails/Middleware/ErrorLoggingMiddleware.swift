@@ -12,7 +12,7 @@ struct ErrorLoggingMiddleware: AsyncMiddleware {
         do {
             return try await next.respond(to: request)
         } catch {
-            let message = "Error: \(error.localizedDescription), at \(request.url)."
+            let message = "Error: \(error.localizedDescription), at \(request.url) with Headers: \(request.headers), Body: \(request.body)."
             await request.application.messageLogs.error(
                 userId: nil,
                 userName: "System",
